@@ -8,8 +8,6 @@
 #include <condition_variable>
 #include <thread>
 
-static const auto sleepUs = std::chrono::microseconds(0);
-
 class SharedMutex {
 public:
     int64_t read() const;
@@ -18,7 +16,7 @@ public:
 private:
     mutable std::shared_mutex _mutex;
     mutable std::condition_variable_any _cv;
-    std::queue<int64_t> _data;
+    std::vector<int64_t> _dataBase;
 };
 
 class NormalMutex {
@@ -29,7 +27,7 @@ public:
 private:
     mutable std::mutex _mutex;
     mutable std::condition_variable _cv;
-    std::queue<int64_t> _data;
+    std::vector<int64_t> _dataBase;
 };
 
 enum class Operation { Read, Write };
@@ -45,7 +43,7 @@ public:
     {
         std::cout << "Mutex type:" << typeid(MutexT).name() << " Loop count: " << _loopCount
         << " Reading time cost(us): " << _readerTimeCostUs.load() << " Writing time cost(us): " 
-        << _writerTimeCostUs.load() << " sleepUs " << sleepUs.count() << std::endl;
+        << _writerTimeCostUs.load() << std::endl;
     }
 
     void run(Operation op) 
